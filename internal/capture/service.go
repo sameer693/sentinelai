@@ -3,6 +3,7 @@ package capture
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/gopacket/gopacket"
@@ -59,6 +60,17 @@ func NewService(iface string, logger *logrus.Logger) *Service {
 // Start begins packet capture on the specified interface
 func (s *Service) Start(ctx context.Context) error {
 	s.logger.WithField("interface", s.interface_).Info("Starting packet capture")
+
+	// If interface is "eth0" (Linux default), try to find a suitable Windows interface
+	if s.interface_ == "eth0" {
+		if winInterface := s.findWindowsInterface(); winInterface != "" {
+			s.logger.WithFields(logrus.Fields{
+				"original_interface": s.interface_,
+				"detected_interface": winInterface,
+			}).Info("Detected Windows environment, using appropriate interface")
+			s.interface_ = winInterface
+		}
+	}
 
 	// Open device for packet capture
 	handle, err := pcap.OpenLive(s.interface_, 1600, true, pcap.BlockForever)
@@ -145,4 +157,53 @@ func (s *Service) processPackets(ctx context.Context) {
 // GetStats returns current capture statistics
 func (s *Service) GetStats() *CaptureStats {
 	return s.stats
+}
+
+// findWindowsInterface attempts to find a suitable network interface on Windows
+func (s *Service) findWindowsInterface() string {
+	devices, err := pcap.FindAllDevs()
+	if err != nil {
+		s.logger.WithError(err).Warn("Failed to enumerate network devices")
+		return ""
+	}
+
+	s.logger.WithField("device_count", len(devices)).Debug("Found network devices")
+
+	// Look for active network interfaces
+	for _, device := range devices {
+		// Skip loopback interfaces
+		if strings.Contains(device.Name, "Loopback") {
+			continue
+		}
+
+		// Look for interfaces with IP addresses (likely active)
+		if len(device.Addresses) > 0 {
+			for _, addr := range device.Addresses {
+				// Check if it's not a loopback address
+				if addr.IP != nil && !addr.IP.IsLoopback() {
+					s.logger.WithFields(logrus.Fields{
+						"device_name": device.Name,
+						"description": device.Description,
+						"ip_address":  addr.IP.String(),
+					}).Info("Found suitable network interface")
+					return device.Name
+				}
+			}
+		}
+	}
+
+	s.logger.Warn("No suitable network interface found, trying first non-loopback device")
+
+	// Fallback: use first non-loopback device
+	for _, device := range devices {
+		if !strings.Contains(device.Name, "Loopback") {
+			s.logger.WithFields(logrus.Fields{
+				"device_name": device.Name,
+				"description": device.Description,
+			}).Info("Using fallback network interface")
+			return device.Name
+		}
+	}
+
+	return ""
 }

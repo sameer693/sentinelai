@@ -51,6 +51,21 @@ docker-compose up -d
 
 # View logs
 docker-compose logs -f sentinelai
+
+#start currently
+go build ./cmd/sentinelai
+Great! Now let's test the new interfaces command to see what network interfaces are available:
+
+
+# List available network interfaces
+.\sentinelai.exe interfaces
+
+# Run with specific interface and debug logging
+.\sentinelai.exe start --interface "your-interface-name" --log-level debug
+
+
+# Run with default settings (auto-detects best interface)
+.\sentinelai.exe start
 ```
 
 ### Manual Installation

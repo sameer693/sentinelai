@@ -15,6 +15,7 @@ import (
 	"masswall/internal/policy"
 	"masswall/internal/server"
 
+	"github.com/gopacket/gopacket/pcap"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -61,9 +62,16 @@ var configCmd = &cobra.Command{
 	},
 }
 
+var interfacesCmd = &cobra.Command{
+	Use:   "interfaces",
+	Short: "List available network interfaces",
+	Run:   listInterfaces,
+}
+
 func init() {
 	rootCmd.AddCommand(startCmd)
 	rootCmd.AddCommand(configCmd)
+	rootCmd.AddCommand(interfacesCmd)
 
 	// Add flags
 	rootCmd.PersistentFlags().String("config", "", "config file (default is ./configs/sentinelai.yaml)")
@@ -176,6 +184,38 @@ func runSentinelAI(cmd *cobra.Command, args []string) {
 		logger.Info("Graceful shutdown completed")
 	case <-time.After(30 * time.Second):
 		logger.Warn("Shutdown timeout reached, forcing exit")
+	}
+}
+
+func listInterfaces(cmd *cobra.Command, args []string) {
+	fmt.Println("Available network interfaces:")
+	fmt.Println("=============================")
+
+	devices, err := pcap.FindAllDevs()
+	if err != nil {
+		fmt.Printf("Error listing interfaces: %v\n", err)
+		return
+	}
+
+	for i, device := range devices {
+		fmt.Printf("%d. %s\n", i+1, device.Name)
+		if device.Description != "" {
+			fmt.Printf("   Description: %s\n", device.Description)
+		}
+
+		if len(device.Addresses) > 0 {
+			fmt.Printf("   Addresses:\n")
+			for _, addr := range device.Addresses {
+				if addr.IP != nil {
+					fmt.Printf("     IP: %s\n", addr.IP.String())
+				}
+			}
+		}
+		fmt.Println()
+	}
+
+	if len(devices) == 0 {
+		fmt.Println("No network interfaces found.")
 	}
 }
 
