@@ -1,0 +1,129 @@
+# SentinelAI Configuration File
+# AI-Powered Next-Generation Firewall
+
+# Application Settings
+app:
+  name: "SentinelAI"
+  version: "v0.1.0-alpha"
+  environment: "development"
+  debug: true
+
+# Network Interface Configuration
+network:
+  interface: "eth0"  # Network interface to monitor
+  promiscuous: true  # Enable promiscuous mode for packet capture
+  buffer_size: 1048576  # 1MB packet buffer
+  snaplen: 1600  # Packet snapshot length
+  timeout: "30s"  # Packet capture timeout
+
+# Management API Server
+server:
+  host: "0.0.0.0"
+  port: 8080
+  tls:
+    enabled: false
+    cert_file: ""
+    key_file: ""
+  cors:
+    enabled: true
+    allowed_origins: ["*"]
+
+# Machine Learning Configuration
+ml:
+  enabled: true
+  model_path: "./models"
+  inference:
+    batch_size: 32
+    timeout: "1s"
+    max_concurrent: 10
+  models:
+    - name: "encrypted_traffic_cnn"
+      type: "cnn"
+      path: "./models/encrypted_traffic_v1.onnx"
+      enabled: true
+    - name: "anomaly_detection"
+      type: "isolation_forest"
+      path: "./models/anomaly_detection_v1.onnx"
+      enabled: true
+
+# Policy Engine Configuration
+policy:
+  default_action: "allow"
+  evaluation_timeout: "100ms"
+  rules_file: "./configs/rules.yaml"
+  
+# Zero Trust Configuration
+zerotrust:
+  enabled: false
+  identity_provider:
+    type: "oidc"
+    issuer_url: ""
+    client_id: ""
+    client_secret: ""
+  risk_threshold: 0.7
+  step_up_auth: true
+
+# Monitoring and Metrics
+monitoring:
+  prometheus:
+    enabled: true
+    port: 9090
+    path: "/metrics"
+  logging:
+    level: "info"  # debug, info, warn, error
+    format: "json"  # json, text
+    output: "stdout"  # stdout, file
+    file_path: "./logs/sentinelai.log"
+  
+# Performance Tuning
+performance:
+  max_flows: 1000000  # Maximum concurrent flows to track
+  flow_timeout: "5m"  # Flow inactivity timeout
+  gc_interval: "30s"  # Garbage collection interval
+  worker_threads: 0   # 0 = auto-detect based on CPU cores
+
+# Database Configuration (for flow storage and analytics)
+database:
+  type: "sqlite"  # sqlite, postgres, influxdb
+  connection_string: "./data/sentinelai.db"
+  max_connections: 10
+  connection_timeout: "5s"
+
+# Threat Intelligence
+threat_intel:
+  enabled: false
+  feeds:
+    - name: "misp"
+      url: ""
+      api_key: ""
+      enabled: false
+    - name: "otx"
+      url: "https://otx.alienvault.com"
+      api_key: ""
+      enabled: false
+  update_interval: "1h"
+
+# SOAR Integration
+soar:
+  enabled: false
+  webhook_url: ""
+  auth_token: ""
+  
+# Federated Learning
+federated_learning:
+  enabled: false
+  coordinator_url: ""
+  node_id: ""
+  update_interval: "24h"
+  privacy:
+    differential_privacy: true
+    epsilon: 1.0
+
+# Development and Testing
+development:
+  mock_data: true
+  synthetic_traffic: false
+  benchmark_mode: false
+  profiling:
+    enabled: false
+    port: 6060
