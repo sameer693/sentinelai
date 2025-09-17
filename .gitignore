@@ -18,6 +18,23 @@
 go.work
 tmp/
 
+# SentinelAI ML Training - Exclude large datasets and models
+datasets/
+*.csv
+*.pcap
+*.binetflow
+*.h5
+*.pkl
+*.onnx
+ml-training/models/*.h5
+ml-training/models/*.pkl
+ml-training/models/*.onnx
+ml-training/logs/
+.ipynb_checkpoints/
+__pycache__/
+*.pyc
+*.pyo
+
 # IDE specific files
 .vscode
 .idea
@@ -32,3 +49,54 @@ main
 # OS X generated file
 .DS_Store
 
+
+# SentinelAI ML Training - Exclude large files
+datasets/
+*.csv
+*.pcap
+*.binetflow
+*.h5
+*.pkl
+*.onnx
+ml-training/models/*.h5
+ml-training/models/*.pkl
+ml-training/models/*.onnx
+ml-training/logs/
+.ipynb_checkpoints/
+__pycache__/
+*.pyc
+*.pyo
+
+# SentinelAI ML Training - Exclude large files
+datasets/
+*.csv
+*.pcap
+*.binetflow
+*.h5
+*.pkl
+*.onnx
+ml-training/models/*.h5
+ml-training/models/*.pkl
+ml-training/models/*.onnx
+ml-training/logs/
+.ipynb_checkpoints/
+__pycache__/
+*.pyc
+*.pyo
+
+# SentinelAI ML Training - Exclude large files
+datasets/
+*.csv
+*.pcap
+*.binetflow
+*.h5
+*.pkl
+*.onnx
+ml-training/models/*.h5
+ml-training/models/*.pkl
+ml-training/models/*.onnx
+ml-training/logs/
+.ipynb_checkpoints/
+__pycache__/
+*.pyc
+*.pyo

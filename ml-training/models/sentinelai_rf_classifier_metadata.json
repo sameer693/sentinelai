@@ -1,0 +1,11 @@
+{
+  "model_type": "RandomForestClassifier",
+  "training_samples": 125973,
+  "features": 41,
+  "classes": [
+    "attack",
+    "normal"
+  ],
+  "train_accuracy": 0.9978566835750518,
+  "test_accuracy": 0.7687633073101491
+}

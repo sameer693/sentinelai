@@ -1,0 +1,44 @@
+# SentinelAI Dataset Configuration
+datasets:
+  unsw_nb15:
+    path: "./datasets/raw/unsw_nb15/UNSW_NB15_training-set.csv"
+    test_path: "./datasets/raw/unsw_nb15/UNSW_NB15_testing-set.csv"
+    features: 49
+    samples: 2540044
+    classes: 10
+    label_column: "Label"
+    
+  cicids2017:
+    path: "./datasets/raw/cicids2017/"
+    features: 80
+    samples: 2830743
+    classes: 15
+    label_column: "Label"
+    
+  ctu13:
+    path: "./datasets/raw/ctu13/"
+    features: 13
+    samples: 1000000
+    classes: 2
+    label_column: "Label"
+
+# Training configuration
+training:
+  test_size: 0.2
+  validation_size: 0.2
+  random_state: 42
+  
+  cnn_classifier:
+    epochs: 50
+    batch_size: 64
+    learning_rate: 0.001
+    
+  anomaly_detection:
+    contamination: 0.1
+    eps: 0.5
+    min_samples: 5
+
+# Model export
+export:
+  format: "onnx"  # onnx, tensorflow, sklearn
+  output_dir: "./ml-training/models/"
