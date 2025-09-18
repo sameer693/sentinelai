@@ -1,0 +1,335 @@
+{
+  "id": null,
+  "title": "SentinelAI - Security Analysis Dashboard",
+  "tags": ["sentinelai", "security", "threats", "analysis"],
+  "style": "dark",
+  "timezone": "browser",
+  "refresh": "10s",
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Threat Detection Timeline",
+      "type": "timeseries",
+      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 0},
+      "targets": [
+        {
+          "expr": "rate(sentinelai_threats_detected_total[1m])",
+          "legendFormat": "{{attack_type}} - {{severity}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "palette-classic"},
+          "unit": "ops",
+          "min": 0
+        }
+      },
+      "options": {
+        "legend": {
+          "calcs": ["lastNotNull", "max"],
+          "displayMode": "table",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 2,
+      "title": "Attack Vector Distribution",
+      "type": "piechart",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+      "targets": [
+        {
+          "expr": "sum by (attack_type) (increase(sentinelai_threats_detected_total[1h]))",
+          "legendFormat": "{{attack_type}}",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "pieType": "pie",
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "values": ["percent"]
+        }
+      }
+    },
+    {
+      "id": 3,
+      "title": "Geographic Threat Map",
+      "type": "geomap",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+      "targets": [
+        {
+          "expr": "sum by (source_country) (increase(sentinelai_threats_detected_total[1h]))",
+          "legendFormat": "{{source_country}}",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "view": {
+          "id": "coords",
+          "lat": 0,
+          "lon": 0,
+          "zoom": 2
+        },
+        "controls": {
+          "showZoom": true,
+          "mouseWheelZoom": true,
+          "showAttribution": true
+        }
+      }
+    },
+    {
+      "id": 4,
+      "title": "ML Model Performance",
+      "type": "timeseries",
+      "gridPos": {"h": 6, "w": 8, "x": 0, "y": 16},
+      "targets": [
+        {
+          "expr": "rate(sentinelai_ml_true_positives_total[5m])",
+          "legendFormat": "True Positives/sec",
+          "refId": "A"
+        },
+        {
+          "expr": "rate(sentinelai_false_positives_total[5m])",
+          "legendFormat": "False Positives/sec",
+          "refId": "B"
+        },
+        {
+          "expr": "rate(sentinelai_false_negatives_total[5m])",
+          "legendFormat": "False Negatives/sec",
+          "refId": "C"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "palette-classic"},
+          "unit": "ops",
+          "min": 0
+        }
+      }
+    },
+    {
+      "id": 5,
+      "title": "Threat Score Distribution",
+      "type": "histogram",
+      "gridPos": {"h": 6, "w": 8, "x": 8, "y": 16},
+      "targets": [
+        {
+          "expr": "increase(sentinelai_threat_score_bucket[5m])",
+          "legendFormat": "{{le}}",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "bucketSize": 0.1,
+        "bucketOffset": 0
+      }
+    },
+    {
+      "id": 6,
+      "title": "Policy Actions",
+      "type": "stat",
+      "gridPos": {"h": 6, "w": 8, "x": 16, "y": 16},
+      "targets": [
+        {
+          "expr": "sum(rate(sentinelai_policy_actions_total[5m]))",
+          "legendFormat": "Actions/sec",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "unit": "ops",
+          "thresholds": {
+            "steps": [
+              {"color": "green", "value": 0},
+              {"color": "yellow", "value": 10},
+              {"color": "red", "value": 50}
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 7,
+      "title": "Network Flow Analysis",
+      "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 22},
+      "targets": [
+        {
+          "expr": "rate(sentinelai_flows_total[1m])",
+          "legendFormat": "{{protocol}} flows/sec",
+          "refId": "A"
+        },
+        {
+          "expr": "histogram_quantile(0.95, rate(sentinelai_flow_duration_seconds_bucket[5m]))",
+          "legendFormat": "P95 Flow Duration",
+          "refId": "B",
+          "yAxis": 2
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "palette-classic"},
+          "unit": "ops"
+        },
+        "overrides": [
+          {
+            "matcher": {"id": "byName", "options": "P95 Flow Duration"},
+            "properties": [
+              {"id": "unit", "value": "s"},
+              {"id": "custom.axisPlacement", "value": "right"}
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": 8,
+      "title": "Alert Status",
+      "type": "table",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 22},
+      "targets": [
+        {
+          "expr": "ALERTS{job=\"sentinelai\"}",
+          "legendFormat": "",
+          "refId": "A",
+          "instant": true
+        }
+      ],
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "__name__": true,
+              "job": true,
+              "instance": true
+            }
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {"id": "byName", "options": "alertstate"},
+            "properties": [
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "thresholds"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "steps": [
+                    {"color": "green", "value": null},
+                    {"color": "red", "value": 1}
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "selected": false,
+          "text": "All",
+          "value": "$__all"
+        },
+        "hide": 0,
+        "includeAll": true,
+        "label": "Attack Type",
+        "multi": true,
+        "name": "attack_type",
+        "options": [],
+        "query": "label_values(sentinelai_threats_detected_total, attack_type)",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
+      },
+      {
+        "current": {
+          "selected": false,
+          "text": "All",
+          "value": "$__all"
+        },
+        "hide": 0,
+        "includeAll": true,
+        "label": "Severity",
+        "multi": true,
+        "name": "severity",
+        "options": [],
+        "query": "label_values(sentinelai_threats_detected_total, severity)",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
+      }
+    ]
+  },
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      },
+      {
+        "datasource": "Prometheus",
+        "enable": true,
+        "expr": "ALERTS{job=\"sentinelai\", alertstate=\"firing\"}",
+        "iconColor": "red",
+        "name": "SentinelAI Alerts",
+        "titleFormat": "{{alertname}}",
+        "textFormat": "{{summary}}"
+      }
+    ]
+  },
+  "schemaVersion": 30,
+  "version": 1,
+  "links": [
+    {
+      "asDropdown": false,
+      "icon": "external link",
+      "includeVars": false,
+      "keepTime": false,
+      "tags": ["sentinelai"],
+      "targetBlank": false,
+      "title": "SentinelAI Dashboards",
+      "tooltip": "",
+      "type": "dashboards",
+      "url": ""
+    }
+  ]
+}

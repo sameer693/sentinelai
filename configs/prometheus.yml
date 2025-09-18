@@ -3,11 +3,22 @@ global:
   scrape_interval: 15s
   evaluation_interval: 15s
 
+# Alerting rules
+rule_files:
+  - "/etc/prometheus/rules/*.yml"
+
+# Alertmanager configuration (optional)
+# alerting:
+#   alertmanagers:
+#     - static_configs:
+#         - targets:
+#           - alertmanager:9093
+
 scrape_configs:
   # SentinelAI metrics
   - job_name: 'sentinelai'
     static_configs:
-      - targets: ['sentinelai:9090']
+      - targets: ['sentinelai:8080']
     scrape_interval: 5s
     metrics_path: /metrics
     
@@ -22,7 +33,8 @@ scrape_configs:
       - targets: ['grafana:3000']
     metrics_path: /metrics
 
-# Alerting rules (basic examples)
-# In production, these would be in separate rule files
-rule_files:
-  - "/etc/prometheus/rules/*.yml"
+  # Node exporter for system metrics (if available)
+  - job_name: 'node'
+    static_configs:
+      - targets: ['node-exporter:9100']
+    scrape_interval: 15s

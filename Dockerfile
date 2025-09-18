@@ -1,4 +1,4 @@
-FROM golang:1.24.4-alpine AS build
+FROM golang:1.24.5-alpine AS build
 
 # Install build dependencies
 RUN apk add --no-cache gcc musl-dev linux-headers libpcap-dev
@@ -13,12 +13,12 @@ RUN go mod download
 COPY . .
 
 # Build SentinelAI
-RUN CGO_ENABLED=1 GOOS=linux go build -o sentinelai cmd/sentinelai/main.go
+RUN CGO_ENABLED=1 GOOS=linux go build -o sentinelai cmd/api/main.go
 
-FROM alpine:3.20.1 AS prod
+FROM alpine:latest AS prod
 
-# Install runtime dependencies
-RUN apk add --no-cache libpcap ca-certificates
+# Install runtime dependencies and upgrade all packages
+RUN apk update && apk upgrade && apk add --no-cache libpcap ca-certificates
 
 # Create non-root user
 RUN addgroup -g 1001 sentinelai && \
@@ -49,6 +49,6 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
     CMD wget --no-verbose --tries=1 --spider http://localhost:8080/health || exit 1
 
 # Default command
-CMD ["./sentinelai", "start", "--config", "/app/configs/sentinelai.yaml"]
+CMD ["./sentinelai"]
 
 

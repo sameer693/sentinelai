@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"masswall/internal/capture"
+	"masswall/internal/metrics"
 	"masswall/internal/ml"
 	"masswall/internal/ngfw"
 	"masswall/internal/policy"
@@ -117,6 +118,17 @@ func runSentinelAI(cmd *cobra.Command, args []string) {
 	// Initialize components
 	policyEngine := policy.NewEngine(logger)
 	mlService := ml.NewService(logger)
+
+	// Initialize metrics collector
+	metricsCollector := metrics.NewCollector(logger)
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		if err := metricsCollector.Start(ctx, 9090); err != nil {
+			logger.Errorf("Metrics collector error: %v", err)
+		}
+	}()
 
 	// Start packet capture if enabled
 	if viper.GetBool("enable-capture") {

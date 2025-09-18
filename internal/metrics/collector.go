@@ -55,6 +55,12 @@ type Collector struct {
 
 // NewCollector creates a new metrics collector
 func NewCollector(logger *logrus.Logger) *Collector {
+	// Create default logger if nil
+	if logger == nil {
+		logger = logrus.New()
+		logger.SetLevel(logrus.InfoLevel)
+	}
+
 	c := &Collector{
 		logger: logger,
 	}
@@ -303,6 +309,9 @@ func (c *Collector) Start(ctx context.Context, port int) error {
 
 	c.logger.WithField("port", port).Info("Starting metrics server")
 
+	// Start mock data generation for demo purposes
+	go c.generateMockData(ctx)
+
 	// Start server in goroutine
 	go func() {
 		if err := c.server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
@@ -447,4 +456,51 @@ func (pm *PerformanceMonitor) collectSystemMetrics() {
 	cpuPercent := 0.0 // Placeholder
 
 	pm.collector.UpdateSystemMetrics(cpuPercent, memoryBytes, goroutineCount)
+}
+
+// generateMockData generates mock metrics data for demonstration purposes
+func (c *Collector) generateMockData(ctx context.Context) {
+	ticker := time.NewTicker(5 * time.Second)
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case <-ticker.C:
+			// Generate packet capture metrics
+			c.RecordPacket("eth0", "TCP", 1024)
+			c.RecordPacket("eth0", "UDP", 512)
+			c.RecordPacket("wlan0", "TCP", 2048)
+
+			// Generate flow metrics
+			c.RecordFlow("TCP", "inbound", 30*time.Second, 4096)
+			c.RecordFlow("UDP", "outbound", 10*time.Second, 1024)
+			c.SetActiveFlows(45)
+
+			// Generate ML inference metrics
+			c.RecordInference("malware_detector", "threat", 5*time.Millisecond, 0.85)
+			c.RecordInference("malware_detector", "benign", 3*time.Millisecond, 0.15)
+
+			// Generate threat detection metrics
+			c.RecordThreatDetection("malware", "high")
+			c.RecordThreatDetection("dos", "medium")
+
+			// Generate policy action metrics
+			c.RecordPolicyAction("allow", "rule_001", 1*time.Millisecond)
+			c.RecordPolicyAction("block", "rule_002", 2*time.Millisecond)
+
+			// Generate system metrics
+			var m runtime.MemStats
+			runtime.ReadMemStats(&m)
+			c.UpdateSystemMetrics(75.5, float64(m.Alloc), runtime.NumGoroutine())
+
+			// Generate alerts
+			c.RecordAlert("high_cpu", "warning")
+
+			if c.logger != nil {
+				c.logger.Debug("Generated mock metrics data")
+			}
+		}
+	}
 }

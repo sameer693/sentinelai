@@ -1,0 +1,114 @@
+groups:
+  - name: sentinelai_alerts
+    rules:
+      # High threat detection rate
+      - alert: HighThreatDetectionRate
+        expr: rate(sentinelai_threats_detected_total[5m]) > 10
+        for: 2m
+        labels:
+          severity: warning
+          component: threat_detection
+        annotations:
+          summary: "High threat detection rate detected"
+          description: "SentinelAI is detecting threats at {{ $value }} threats/sec, which is above the normal threshold of 10/sec."
+
+      # High false positive rate
+      - alert: HighFalsePositiveRate
+        expr: rate(sentinelai_false_positives_total[5m]) > 5
+        for: 5m
+        labels:
+          severity: warning
+          component: ml_model
+        annotations:
+          summary: "High false positive rate detected"
+          description: "False positive rate is {{ $value }}/sec, indicating potential model degradation."
+
+      # System latency too high
+      - alert: HighSystemLatency
+        expr: histogram_quantile(0.95, rate(sentinelai_system_latency_seconds_bucket[5m])) > 0.005
+        for: 3m
+        labels:
+          severity: critical
+          component: performance
+        annotations:
+          summary: "System latency is too high"
+          description: "95th percentile latency is {{ $value }}s, exceeding the 5ms threshold."
+
+      # ML inference errors
+      - alert: MLInferenceErrors
+        expr: rate(sentinelai_ml_errors_total[5m]) > 1
+        for: 2m
+        labels:
+          severity: warning
+          component: ml_inference
+        annotations:
+          summary: "ML inference errors detected"
+          description: "ML inference is failing at {{ $value }} errors/sec."
+
+      # High CPU usage
+      - alert: HighCPUUsage
+        expr: sentinelai_cpu_usage_percent > 80
+        for: 5m
+        labels:
+          severity: warning
+          component: system
+        annotations:
+          summary: "High CPU usage"
+          description: "CPU usage is {{ $value }}%, which may impact performance."
+
+      # High memory usage
+      - alert: HighMemoryUsage
+        expr: sentinelai_memory_usage_bytes > 2147483648  # 2GB
+        for: 5m
+        labels:
+          severity: warning
+          component: system
+        annotations:
+          summary: "High memory usage"
+          description: "Memory usage is {{ $value }} bytes, consider scaling or optimization."
+
+      # Packet capture issues
+      - alert: PacketDrops
+        expr: rate(sentinelai_packets_dropped_total[5m]) > 100
+        for: 2m
+        labels:
+          severity: critical
+          component: packet_capture
+        annotations:
+          summary: "High packet drop rate"
+          description: "Packets are being dropped at {{ $value }}/sec, indicating capture buffer overflow."
+
+      # Service down
+      - alert: SentinelAIDown
+        expr: up{job="sentinelai"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: service
+        annotations:
+          summary: "SentinelAI service is down"
+          description: "SentinelAI NGFW service has been down for more than 1 minute."
+
+      # Low throughput
+      - alert: LowThroughput
+        expr: rate(sentinelai_bytes_total[5m]) < 1000000  # Less than 1MB/s
+        for: 10m
+        labels:
+          severity: info
+          component: traffic
+        annotations:
+          summary: "Low network throughput"
+          description: "Network throughput is {{ $value }} bytes/s, which is unusually low."
+
+  - name: sentinelai_predictions
+    rules:
+      # Predicted threat surge
+      - alert: PredictedThreatSurge
+        expr: increase(sentinelai_threats_detected_total[1h]) > increase(sentinelai_threats_detected_total[1h] offset 24h) * 1.5
+        for: 5m
+        labels:
+          severity: warning
+          component: threat_analysis
+        annotations:
+          summary: "Threat detection surge predicted"
+          description: "Current threat detection rate is 50% higher than same time yesterday, indicating potential attack campaign."
