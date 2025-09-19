@@ -93,13 +93,6 @@ graph TB
     NET -.-> PROM
     NET -.-> GRAF
     NET -.-> REDIS
-    
-    style SENT fill:#ff6b6b
-    style PROM fill:#4ecdc4
-    style GRAF fill:#45b7d1
-    style REDIS fill:#96ceb4
-    style DASH fill:#feca57
-    style THREAT fill:#ff9ff3
 ```
 
 ## 2. High-Level System Architecture
@@ -169,12 +162,6 @@ graph LR
     %% Feedback Loop
     FED -.-> AI
     ANOM -.-> POL
-    
-    style CAP fill:#ff6b6b
-    style AI fill:#4ecdc4
-    style POL fill:#45b7d1
-    style ML fill:#96ceb4
-    style VIZ fill:#feca57
 ```
 
 ## 3. Detailed Component Architecture
@@ -269,12 +256,6 @@ graph TB
     PKT --> METRICS_EP
     API --> CONFIG
     CONFIG --> HEALTH
-    
-    style PKT fill:#ff6b6b
-    style CNN fill:#4ecdc4
-    style RISK fill:#45b7d1
-    style EXEC fill:#96ceb4
-    style API fill:#feca57
 ```
 
 ## 4. Data Flow Architecture
@@ -395,11 +376,6 @@ graph TB
     %% Feedback Loops
     POST -.-> MONITOR
     UPDATE -.-> TRAIN
-    
-    style TRAIN fill:#ff6b6b
-    style INF fill:#4ecdc4
-    style REG fill:#45b7d1
-    style LOCAL fill:#96ceb4
 ```
 
 ## 6. Monitoring and Observability Architecture
@@ -470,11 +446,6 @@ graph TB
     AUDIT --> SEC_D
     ACCESS --> PERF
     ERROR --> ALERT
-    
-    style PROM fill:#ff6b6b
-    style GRAF fill:#4ecdc4
-    style ALERT fill:#45b7d1
-    style SEC_D fill:#96ceb4
 ```
 
 ## 7. Deployment Architecture
@@ -548,11 +519,6 @@ graph TB
     K8S --> HELM
     HELM --> ISTIO
     ISTIO --> STORAGE
-    
-    style GIT fill:#ff6b6b
-    style CI fill:#4ecdc4
-    style PROD fill:#45b7d1
-    style K8S fill:#96ceb4
 ```
 
 ## 8. Security Architecture
@@ -623,11 +589,6 @@ graph TB
     FEED --> INTEL
     INTEL --> SentinelAI
     SentinelAI --> SHARING
-    
-    style SentinelAI fill:#ff6b6b
-    style IDENTITY fill:#4ecdc4
-    style SIEM_INT fill:#45b7d1
-    style INTEL fill:#96ceb4
 ```
 
 ## 9. Container Network Architecture
@@ -690,11 +651,6 @@ graph TB
     LOGS_VOL --> SENT_NET
     PROM_VOL --> PROM_NET
     GRAF_VOL --> GRAF_NET
-    
-    style SENT_NET fill:#ff6b6b
-    style PROM_NET fill:#4ecdc4
-    style GRAF_NET fill:#45b7d1
-    style REDIS_NET fill:#96ceb4
 ```
 
 These comprehensive Mermaid diagrams provide detailed visualizations of your SentinelAI infrastructure from multiple perspectives, including overall architecture, component interactions, data flows, and deployment strategies. You can use these diagrams in documentation, presentations, or planning sessions.
